@@ -2,10 +2,10 @@
 
 namespace gparse {
 
-const Command Command::OK("ok");
-const Command Command::Null("");
+//const Command Command::OK("ok");
+//const Command Command::Null("");
 
-Command::Command(std::string const& cmd) {
+Command::Command(std::string const& cmd) : opcodeStr(0) {
 	//initialize the command from a line of GCode
 	std::string piece;
 	std::string::const_iterator it=cmd.begin();
@@ -14,11 +14,18 @@ Command::Command(std::string const& cmd) {
 		    ++it;
 		} while (it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*');
 	}
+	//now at the first character of the opcode (spaces between line number & this have already been skipped.
+	//but if the command started with a space & no line number, we'll still be at a space.
+	for (; it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*'; ++it) {
+	    opcodeStr = (opcodeStr << 8) + *it;
+	}
+	//now at the first space after opcode or end of cmd or at the '*' character of checksum.
+	//spaces should be handled below:
 	for (; it != cmd.end(); ++it) { //split the command on spaces...
 		char chr = *it;
 		if (chr == ' ' || chr == '\n' || chr == '\t' || chr == '*') {
 			if (piece.length()) { //allow for multiple spaces between parameters
-				this->addPieceOrOpcode(piece);
+				this->addPiece(piece);
 				piece = "";
 			}
 			if (chr == '*') { //checksum. Don't verify for now.
@@ -29,28 +36,56 @@ Command::Command(std::string const& cmd) {
 		}
 	}
 	if (piece.length()) {
-		this->addPieceOrOpcode(piece);
+		this->addPiece(piece);
 	}
 }
 
-void Command::addPieceOrOpcode(std::string const& piece) {
-	if (this->getOpcode().length()) {
-		this->pieces.push_back(piece);
-	} else {
-		this->opcode = piece;
-	}
-}
+/*void Command::addPiece(std::string const& piece) {
+	this->pieces.push_back(piece);
+}*/
 
-bool Command::empty() const {
-	return getOpcode().empty();
-}
+bool Command::isFirstChar(char c) const {
+		    char s[4];
+		    //extract bytes from opcodeStr.
+		    //cannot just cast to char* due to endianness.
+		    s[0] = (char)((opcodeStr & 0xff000000u) >> 24);
+		    s[1] = (char)((opcodeStr & 0xff0000u) >> 16);
+		    s[2] = (char)((opcodeStr & 0xff00u) >> 8);
+		    s[3] = (char)(opcodeStr & 0xffu);
+		    return (s[0] == c || (s[0] == 0 && 
+		             (s[1] == c || (s[1] == 0 &&
+		               (s[2] == c || (s[2] == 0 && 
+		                 s[3] == c)
+		               )
+		             ))
+		           ));
+		               
+		}
+
+/*bool Command::empty() const {
+	return this->opcode.empty();
+}*/
 
 std::string Command::getOpcode() const {
-	return this->opcode;
+    //return opcode;
+    std::string ret;
+    char s[4];
+    //extract bytes from opcodeStr.
+    //cannot just cast to char* due to endianness.
+    s[0] = (char)((opcodeStr & 0xff000000u) >> 24);
+    s[1] = (char)((opcodeStr & 0xff0000u) >> 16);
+    s[2] = (char)((opcodeStr & 0xff00u) >> 8);
+    s[3] = (char)(opcodeStr & 0xffu);
+    for (int i=0; i<4; ++i) {
+        if (s[i]) { //add non-zero characters to the string
+            ret += s[i];
+        }
+    }
+    return ret;
 }
 
 std::string Command::toGCode() const {
-	std::string r=opcode;
+	std::string r=getOpcode();
 	for (std::string const& s : this->pieces) {
 		r += ' ';
 		r += s;
