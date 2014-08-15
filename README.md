@@ -11,4 +11,3 @@ Limitations
 ======
 
 gparse doesn't currently support the parsing of comments (causes a crash). Also, checksums are parsed, but not checked.
-Note, it is currently not buildable without the printip logging.h file (this will be fixed).
