@@ -15,6 +15,7 @@
 
 #include <string>
 #include "command.h"
+#include "response.h"
 
 
 namespace gparse {
@@ -29,7 +30,9 @@ class Com {
 		//returns true if there is a command ready to be interpreted.
 		bool tendCom();
 		Command getCommand() const;
-		void reply(const Command &response);
+		//void reply(const Command &response);
+		void reply(const std::string &resp);
+		void reply(const Response &resp);
 			
 };
 
