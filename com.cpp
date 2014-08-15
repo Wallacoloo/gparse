@@ -21,7 +21,7 @@ bool Com::tendCom() {
 				LOG("command: %s\n", _pending.c_str());
 			}*/
 			_pending = "";
-			return true;
+			return !_parsed.empty(); //it's possible we got a blank line, or a comment.
 		} else if (chr != '\r') {
 			_pending += chr;
 		}

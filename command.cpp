@@ -10,18 +10,19 @@ Command::Command(std::string const& cmd) : opcodeStr(0) {
 	if (cmd[0] == 'N') { //line-number
 		do {
 		    ++it;
-		} while (it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*');
+		} while (it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*' && *it != ';');
 	}
 	//now at the first character of the opcode (spaces between line number & this have already been skipped.
 	//but if the command started with a space & no line number, we'll still be at a space.
-	for (; it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*'; ++it) {
+	for (; it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*' && *it != ';'; ++it) {
 	    opcodeStr = (opcodeStr << 8) + *it;
 	}
 	//now at the first space after opcode or end of cmd or at the '*' character of checksum.
-	//spaces should be handled below:
-	for (; it != cmd.end(); ++it) { //split the command on spaces...
+	//spaces should be handled below.
+	//Now split the command on spaces or tabs:
+	for (; it != cmd.end() && *it != ';' && *it != '\n'; ++it) {
 		char chr = *it;
-		if (chr == ' ' || chr == '\n' || chr == '\t' || chr == '*') {
+		if (chr == ' ' || chr == '\t' || chr == '*') {
 			if (piece.length()) { //allow for multiple spaces between parameters
 				this->addPiece(piece);
 				piece = "";
