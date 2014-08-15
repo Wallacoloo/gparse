@@ -30,10 +30,8 @@ class Command {
 	uint32_t opcodeStr; //opcode still encoded as a 4-character string. MSB=first char, LSB=last char. String is right-adjusted (ie, the MSBs are 0 in the case that opcode isn't full 4 characters).
 	std::vector<std::string> pieces; //the command when split on spaces. Eg "G1 X2 Y3" -> ["G1", "X2", "Y3"]
 	public:
-		//static const Command OK;
-		//static const Command Null;
 		//initialize the command object from a line of GCode
-		Command() : opcodeStr(0) {}
+		inline Command() : opcodeStr(0) {}
 		Command(std::string const&);
 		inline bool empty() const {
 		    return opcodeStr == 0;
@@ -42,31 +40,82 @@ class Command {
 		std::string getOpcode() const;
 		std::string toGCode() const;
 		bool hasParam(char label) const;
-		std::string getStrParam(char label) const;
+		
 		std::string getStrParam(char label, bool &hasParam) const;
+		inline std::string getStrParam(char label) const {
+		    bool _ignore;
+            return getStrParam(label, _ignore);
+        }
+        
 		float getFloatParam(char label, float def, bool &hasParam) const;
-		float getFloatParam(char label, float def=NAN) const;
-		float getFloatParam(char label, bool &hasParam) const;
-		float getX(float def=NAN) const;
-		float getX(bool &hasX) const;
-		float getY(float def=NAN) const;
-		float getY(bool &hasY) const;
-		float getZ(float def=NAN) const;
-		float getZ(bool &hasZ) const;
-		float getE(float def=NAN) const; //extrusion distance
-		float getE(bool &hasE) const;
-		float getF(float def=NAN) const; //extruder feed-rate.
-		float getF(bool &hasF) const;
-		float getS(float def=NAN) const; //PWM rate
-		float getS(bool &hasS) const;
-		bool hasX() const;
-		bool hasY() const;
-		bool hasZ() const;
-		bool hasE() const;
-		bool hasF() const;
-		bool hasS() const;
-		bool hasAnyXYZParam() const;
-		bool hasAnyXYZEParam() const;
+		inline float getFloatParam(char label, float def=NAN) const {
+		    bool _ignore;
+            return getFloatParam(label, def, _ignore);
+		}
+		inline float getFloatParam(char label, bool &hasParam) const {
+		    return getFloatParam(label, NAN, hasParam);
+		}
+		
+		inline float getX(float def=NAN) const {
+		    return getFloatParam('C', def);
+		}
+		inline float getX(bool &hasParam) const {
+		    return getFloatParam('X', hasParam);
+		}
+		inline float getY(float def=NAN) const {
+		    return getFloatParam('Y', def);
+		}
+		inline float getY(bool &hasParam) const {
+		    return getFloatParam('Y', hasParam);
+		}
+		inline float getZ(float def=NAN) const {
+		    return getFloatParam('Z', def);
+		}
+	    inline float getZ(bool &hasParam) const {
+		    return getFloatParam('Z', hasParam);
+		}
+		inline float getE(float def=NAN) const { //extrusion distance
+		    return getFloatParam('E', def);
+		}
+		inline float getE(bool &hasParam) const {
+		    return getFloatParam('E', hasParam);
+		}
+		inline float getF(float def=NAN) const { //extruder feed-rate.
+		    return getFloatParam('F', def);
+		}
+		inline float getF(bool &hasParam) const {
+		    return getFloatParam('F', hasParam);
+		}
+		inline float getS(float def=NAN) const { //PWM rate
+		    return getFloatParam('S', def);
+		}
+		inline float getS(bool &hasParam) const {
+		    return getFloatParam('S', hasParam);
+		}
+		inline bool hasX() const {
+		    return hasParam('X');
+		}
+		inline bool hasY() const {
+		    return hasParam('Y');
+		}
+		inline bool hasZ() const {
+		    return hasParam('Z');
+		}
+		inline bool hasE() const {
+		    return hasParam('E');
+		}
+		inline bool hasF() const {
+		    return hasParam('F');
+		}
+		inline bool hasS() const {
+		    return hasParam('S');
+		}
+		inline bool hasAnyXYZParam() const {
+		    return hasX() || hasY() || hasZ();
+		}
+		inline bool hasAnyXYZEParam() const {
+		    return hasAnyXYZParam() || hasE();
+		}
 		inline bool isG0() const { return isOpcode(0x4730u); }
         inline bool isG1() const { return isOpcode(0x4731u); }
         inline bool isG2() const { return isOpcode(0x4732u); }

@@ -2,8 +2,6 @@
 
 namespace gparse {
 
-//const Command Command::OK("ok");
-//const Command Command::Null("");
 
 Command::Command(std::string const& cmd) : opcodeStr(0) {
 	//initialize the command from a line of GCode
@@ -117,23 +115,23 @@ std::string Command::getStrParam(char label, bool &hasParam) const {
     hasParam = false;
     return "";
 }
-std::string Command::getStrParam(char label) const {
+/*std::string Command::getStrParam(char label) const {
     bool _ignore;
     return this->getStrParam(label, _ignore);
-}
+}*/
 float Command::getFloatParam(char label, float def, bool &hasParam) const {
     std::string s = this->getStrParam(label, hasParam);
     return hasParam ? std::stof(s) : def;
 }
-float Command::getFloatParam(char label, float def) const {
+/*float Command::getFloatParam(char label, float def) const {
     bool _ignore;
     return this->getFloatParam(label, def, _ignore);
 }
 float Command::getFloatParam(char label, bool &hasParam) const {
     return this->getFloatParam(label, NAN, hasParam);
-}
+}*/
 
-float Command::getX(float def) const {
+/*float Command::getX(float def) const {
     return this->getFloatParam('X', def);
 }
 float Command::getX(bool &hasParam) const {
@@ -168,9 +166,9 @@ float Command::getS(float def) const {
 }
 float Command::getS(bool &hasParam) const {
     return this->getFloatParam('S', hasParam);
-}
+}*/
 
-bool Command::hasX() const {
+/*bool Command::hasX() const {
 	return hasParam('X');
 }
 bool Command::hasY() const {
@@ -194,6 +192,6 @@ bool Command::hasAnyXYZParam() const {
 }
 bool Command::hasAnyXYZEParam() const {
 	return hasAnyXYZParam() || hasE();
-}
+}*/
 
 }
