@@ -6,15 +6,17 @@
 
 namespace gparse {
 
-Com::Com() : _fd(-1) {}
-Com::Com(const std::string &file) : _fd(open(file.c_str(), O_RDWR | O_NONBLOCK)) {}
+Com::Com() : _readFd(NO_HANDLE), _writeFd(NO_HANDLE) {}
+Com::Com(const std::string &fileR) : _readFd(open(fileR.c_str(), O_RDWR | O_NONBLOCK)), _writeFd(NO_HANDLE) {}
+Com::Com(const std::string &fileR, const std::string &fileW) 
+  : _readFd(open(fileR.c_str(), O_RDWR | O_NONBLOCK)), _writeFd(open(fileW.c_str(), O_RDWR | O_NONBLOCK)) {}
 
 bool Com::tendCom() {
 	if (!_parsed.empty()) { 
 		return true;
 	}
 	char chr;
-	while (read(_fd, &chr, 1) == 1) { //read all characters available on serial line.
+	while (read(_readFd, &chr, 1) == 1) { //read all characters available on serial line.
 		if (chr == '\n') {
 			_parsed = Command(_pending);
 			/*if (!NO_LOG_M105 || !_parsed.isM105()) {
@@ -34,8 +36,9 @@ Command Com::getCommand() const {
 }
 
 void Com::reply(const std::string &resp) {
-	//std::string resp = response.toGCode();
-	/*ssize_t res = */ write(_fd, resp.c_str(), resp.length());
+	if (hasWriteFile()) {
+	    /*ssize_t res = */ write(_writeFd, resp.c_str(), resp.length());
+	}
 	_parsed = Command();
 }
 
