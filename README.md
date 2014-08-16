@@ -10,4 +10,6 @@ gparse does not manage any of the state associated with gcode commands (eg unit 
 Limitations
 ======
 
-gparse doesn't currently support the parsing of comments (causes a crash). Also, checksums are parsed, but not checked.
+There is currently almost no error-checking:  
+Checksums are parsed, but not checked.  
+Line numbers are ignored (and missing lines are not noticed).  
