@@ -12,8 +12,8 @@ Command::Command(std::string const& cmd) : opcodeStr(0) {
 		do {
 		    ++it;
 		} while (it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*' && *it != ';');
+		for(; it != cmd.end() && (*it == ' ' || *it == '\t'); ++it) {} //skip spaces between line-number and opcode.
 	}
-	for(; it != cmd.end() && (*it == ' ' || *it == '\t'); ++it) {} //skip spaces between line-number and opcode.
 	//now at the first character of the opcode
 	for (; it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*' && *it != ';'; ++it) {
 	    opcodeStr = (opcodeStr << 8) + *it;
