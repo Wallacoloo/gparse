@@ -7,13 +7,14 @@ Command::Command(std::string const& cmd) : opcodeStr(0) {
 	//initialize the command from a line of GCode
 	std::string piece;
 	std::string::const_iterator it=cmd.begin();
+	for(; it != cmd.end() && (*it == ' ' || *it == '\t'); ++it) {} //skip leading spaces
 	if (cmd[0] == 'N') { //line-number
 		do {
 		    ++it;
 		} while (it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*' && *it != ';');
 	}
-	//now at the first character of the opcode (spaces between line number & this have already been skipped.
-	//but if the command started with a space & no line number, we'll still be at a space.
+	for(; it != cmd.end() && (*it == ' ' || *it == '\t'); ++it) {} //skip spaces between line-number and opcode.
+	//now at the first character of the opcode
 	for (; it != cmd.end() && *it != ' ' && *it != '\n' && *it != '\t' && *it != '*' && *it != ';'; ++it) {
 	    opcodeStr = (opcodeStr << 8) + *it;
 	}
